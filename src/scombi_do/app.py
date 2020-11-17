@@ -109,12 +109,13 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     if aoi is not None:
         
         min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
-    
+        print(min_lon, min_lat, max_lon, max_lat)
+        print(loads(aoi).wkt)
         gdal.Translate(temp_mem,
                        vrt,
                        outputType=gdal.GDT_Byte,
-                       projWin=[min_lon, max_lat, max_lon, min_lat]) #,
-                       #projWinSRS='EPSG:4326')
+                       projWin=[min_lon, max_lat, max_lon, min_lat],
+                       projWinSRS='EPSG:4326')
     
     else:
     

@@ -1,8 +1,8 @@
-red-channel-input: {'class': 'Directory', 'path': 'vdi065jd/'}
-green-channel-input: {'class': 'Directory', 'path': 'j68qq35b/'}
-blue-channel-input: {'class': 'Directory', 'path': '3r9o3ftd/'}
+red-channel-input: {'class': 'Directory', 'path': 'iic2h1fl/'}
+green-channel-input: {'class': 'Directory', 'path': '5cwj8w5a/'}
+blue-channel-input: {'class': 'Directory', 'path': '6y5nd4hw/'}
 red-band: 'swir22'
 green-band: 'swir22'
 blue-band: 'swir22'
 resolution: 'highest'
-aoi: ''
+aoi: 'POLYGON((136.707 -35.991,136.707 -35.804,137.071 -35.804,137.071 -35.991,136.707 -35.991))'
