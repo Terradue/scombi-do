@@ -35,7 +35,10 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
 
 
 def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution):
-
+ 
+    if aoi == '': 
+        aoi = None
+        
     logging.info('Scombidooo!')
     
     target_dir = 'combi'
