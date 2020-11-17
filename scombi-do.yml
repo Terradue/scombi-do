@@ -1,8 +1,8 @@
-red-channel-input: {'class': 'Directory', 'path': '3o8yjqcl/'}
-green-channel-input: {'class': 'Directory', 'path': 'kcewowwb/'}
-blue-channel-input: {'class': 'Directory', 'path': 'n3vt4wqj/'}
-red-band: 'nir'
-green-band: 'green'
-blue-band: 'blue'
+red-channel-input: {'class': 'Directory', 'path': 'vdi065jd/'}
+green-channel-input: {'class': 'Directory', 'path': 'j68qq35b/'}
+blue-channel-input: {'class': 'Directory', 'path': '3r9o3ftd/'}
+red-band: 'swir22'
+green-band: 'swir22'
+blue-band: 'swir22'
 resolution: 'highest'
 aoi: ''

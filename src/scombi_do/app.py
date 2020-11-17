@@ -70,18 +70,18 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     for index, asset in enumerate(assets_href):
         
         #ds = gdal.Translate(f'/vsimem/inmem_{index}.vrt', 
-        ds = gdal.Translate('__{}.tif'.format(bands[index]),  
+        ds = gdal.Translate('{}__{}.tif'.format(index, bands[index]),  
                             asset, 
                             scaleParams=[[0,3000,0,255]],
                             outputType=gdal.GDT_Byte)
         
-        ds = gdal.Translate('_{}.tif'.format(bands[index]), 
+        ds = gdal.Translate('{}_{}.tif'.format(index, bands[index]), 
                             asset)
         
-        cog('_{}.tif'.format(bands[index]),
-            '{}/{}.tif'.format(target_dir, bands[index]))
+        cog('{}_{}.tif'.format(index, bands[index]),
+            '{}/{}_{}.tif'.format(target_dir, index, bands[index]))
         
-        rescaled.append('__{}.tif'.format(bands[index]))
+        rescaled.append('{}__{}.tif'.format(index, bands[index]))
     
     # build a VRT with the rescaled assets with the selected resolution mode
     vrt = 'temp.vrt'
@@ -151,9 +151,9 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         _asset =  get_band_asset(items[index],
                                  bands[index]) #.clone()
         print(_asset)
-        _asset.href = './{}.tif'.format(bands[index])
+        _asset.href = './{}_{}.tif'.format(index, bands[index])
 
-        item.add_asset(bands[index], _asset)
+        item.add_asset('{}_{}'.format(index, bands[index]), _asset)
 
         
     # add the result.tif Asset
