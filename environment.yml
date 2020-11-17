@@ -1,0 +1,11 @@
+name: env_scombi_do
+channels:
+  - terradue
+  - conda-forge
+dependencies:
+  - python=3.7
+  - pystac
+  - gdal=3.1.4
+  - numpy
+  - shapely
+  - click
