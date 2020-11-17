@@ -86,5 +86,7 @@ def cog(input_tif, output_tif, no_data=None):
 
     del(ds)
     
-    os.remove('{}.ovr'.format(input_tif))
-    os.remove(input_tif)
+    if os.path.exists('{}.ovr'.format(input_tif)):
+        # not using the mem driver, clean-up
+        os.remove('{}.ovr'.format(input_tif))
+        os.remove(input_tif)

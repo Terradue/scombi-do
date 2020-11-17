@@ -32,12 +32,13 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
 
 def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi):
 
-    logging.info('Hello World!')
+    logging.info('Scombidooo!')
     
     bands = [red_band, green_band, blue_band]
     
     items = []
     assets = []
+    rescaled = []
     
     for index, input_path in enumerate([red_channel_input, green_channel_input, blue_channel_input]):
     
@@ -49,10 +50,29 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         
         assets.append(get_band_asset(item, bands[index]))
     
+    
+    logging.info('Rescaling and COG for input assets')
+    rescaled = []
+    for index, asset in enumerate(assets):
+        
+        ds = gdal.Translate(f'/vsimem/inmem_{index}.vrt', 
+                            asset, 
+                            scaleParams=[[0,3000,0,255]])
+        
+        ds = gdal.Translate('_{}.tif'.format(bands[index]), 
+                            asset)
+        
+        cog('_{}.tif'.format(bands[index]),
+            '{}.tif'.format(bands[index]))
+        
+        rescaled.append(ds)
+    
     vrt = 'temp.vrt'
     
+    logging.info('Build VRT')
+
     ds = gdal.BuildVRT(vrt,
-                       assets,
+                       rescaled,
                        srcNodata=0,
                        resolution='highest', 
                        separate=True)
@@ -63,13 +83,17 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
 
     del(ds)
     
-    tif = '_result.tif'
+    #tif = '_result.tif'
 
+    temp_mem = '/vsimem/inmem'
+    
+    logging.info('COG and saving results')
+    
     if aoi is not None:
         
         min_lon, min_lat, max_lon, max_lat = loads(aoi['value']).bounds
     
-        gdal.Translate(tif,
+        gdal.Translate(temp_mem,
                        vrt,
                        outputType=gdal.GDT_Int16,
                        projWin=[min_lon, max_lat, max_lon, min_lat],
@@ -77,13 +101,13 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
     else:
     
-        gdal.Translate(tif,
+        gdal.Translate(temp_mem,
                        vrt,
                        outputType=gdal.GDT_Byte)
     
     os.remove(vrt)
     
-    cog('_result.tif', 'result.tif')
+    cog(temp_mem, 'result.tif')
     
     logging.info('Done!')
     
