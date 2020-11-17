@@ -21,7 +21,8 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--green-band', 'green_band', help='')
 @click.option('--blue-band', 'blue_band', help='')
 @click.option('--aoi', '-a', 'aoi', default=None, help='')
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi):
+@click.option('--resolution', 'resolution', default='highest', help='highest, lowest, average')
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution):
     
     main(red_channel_input, 
          green_channel_input, 
@@ -29,10 +30,11 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          red_band, 
          green_band, 
          blue_band, 
-         aoi)
+         aoi, 
+         resolution)
 
 
-def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi):
+def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution):
 
     logging.info('Scombidooo!')
     
@@ -42,7 +44,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
         os.mkdir(target_dir)
     
-    
+    # read the inputs: bands, items and assets
     bands = [red_band, green_band, blue_band]
     
     items = []
@@ -59,6 +61,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         assets_href.append(get_band_asset_href(item, bands[index]))
     
     
+    # rescale and get the original assets (these are part of the output)
     logging.info('Rescaling and COG for input assets')
     rescaled = []
     for index, asset in enumerate(assets_href):
@@ -77,6 +80,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         
         rescaled.append('__{}.tif'.format(bands[index]))
     
+    # build a VRT with the rescaled assets with the selected resolution mode
     vrt = 'temp.vrt'
     
     logging.info('Build VRT')
@@ -84,7 +88,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     ds = gdal.BuildVRT(vrt,
                        rescaled,
                        srcNodata=0,
-                       resolution='highest', 
+                       resolution=resolution, 
                        separate=True)
 
     ds.FlushCache()
@@ -97,7 +101,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
 
     temp_mem = '/vsimem/inmem'
     
-    logging.info('COG and saving results')
+    logging.info('COGify and saving results')
     
     if aoi is not None:
         
@@ -115,6 +119,8 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
                        vrt,
                        outputType=gdal.GDT_Byte)
     
+    cog(temp_mem, f'{target_dir}/combi.tif')
+    
     # clean-up
     for f in rescaled:
     
@@ -122,18 +128,16 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         
     os.remove(vrt)
     
-    cog(temp_mem, f'{target_dir}/result.tif')
-    
     # to STAC
     logging.info('STAC')
     cat = Catalog(id='scombidooo',
                   description="Combined RGB composite") 
     
-    item = Item(id='item_name',
+    item = Item(id='combi',
             geometry=items[0].geometry,
             bbox=items[0].bbox,
             datetime=items[0].datetime,
-            properties=items[0].properties)
+            properties={}) #items[0].properties)
 
     item.common_metadata.set_gsd(10)
 
@@ -150,14 +154,14 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
 
         
     # add the result.tif Asset
-    item.add_asset(key='combi',
-                   asset=Asset(href='./result.tif',
-                               media_type=MediaType.GEOTIFF))
+    item.add_asset(key='rgb',
+                   asset=Asset(href='./combi.tif',
+                               media_type=MediaType.COG))
         
     cat.add_items([item])
     
-    catalog.normalize_and_save(root_href='./',
-                               catalog_type=CatalogType.SELF_CONTAINED)
+    cat.normalize_and_save(root_href='./',
+                           catalog_type=CatalogType.SELF_CONTAINED)
         
     logging.info('Done!')
     
