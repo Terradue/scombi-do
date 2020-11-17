@@ -42,6 +42,22 @@ def get_item(catalog):
         
     return item
 
+def get_band_asset_href(item, band):
+    
+    asset = None
+    
+    eo_item = extensions.eo.EOItemExt(item)
+    
+    if (eo_item.bands) is not None:
+
+        for index, _band in enumerate(eo_item.bands):
+            
+             if _band.common_name in [band]:
+
+                asset_ref = fix_asset_href(item.assets[_band.name].get_absolute_href())
+                
+    return asset_ref
+
 def get_band_asset(item, band):
     
     asset = None
@@ -54,9 +70,10 @@ def get_band_asset(item, band):
             
              if _band.common_name in [band]:
 
-                asset = fix_asset_href(item.assets[_band.name].get_absolute_href())
+                asset = item.assets[_band.name]
                 
     return asset
+
 
 def cog(input_tif, output_tif, no_data=None):
     
