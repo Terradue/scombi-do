@@ -45,7 +45,12 @@ $graph:
       inputBinding:
         position: 8
         prefix: --aoi
-      type: string
+      type: string?
+    inp9:
+      inputBinding:
+        position: 8
+        prefix: --color_expression
+      type: string?  
   outputs:
     results:
       outputBinding:
@@ -94,7 +99,11 @@ $graph:
     aoi:
       doc: Area of interest in WKT
       label: Area of interest
-      type: string
+      type: string?
+    color:
+      doc: Color expression
+      label: Area of interest
+      type: string?
 
   label: Band combination
   outputs:
@@ -114,6 +123,7 @@ $graph:
         inp6: blue-band
         inp7: resolution
         inp8: aoi
+        inp9: color
       out:
       - results
       run: '#clt'
