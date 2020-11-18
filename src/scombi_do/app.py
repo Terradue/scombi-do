@@ -6,6 +6,7 @@ import gdal
 from pystac import *
 from shapely.wkt import loads
 from .helpers import *
+from .conf import read_configuration
 
 logging.basicConfig(stream=sys.stderr, 
                     level=logging.DEBUG,
@@ -21,8 +22,9 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--green-band', 'green_band', help='')
 @click.option('--blue-band', 'blue_band', help='')
 @click.option('--aoi', '-a', 'aoi', default=None, help='')
+@click.option('--conf', default=None)
 @click.option('--resolution', 'resolution', default='highest', help='highest, lowest, average')
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution):
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf):
     
     main(red_channel_input, 
          green_channel_input, 
@@ -31,11 +33,15 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          green_band, 
          blue_band, 
          aoi, 
-         resolution)
+         resolution,
+         conf)
 
 
-def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution):
+def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf):
  
+
+    configuration = read_configuration(conf)
+
     if aoi == '': 
         aoi = None
         
@@ -49,6 +55,8 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
     # read the inputs: bands, items and assets
     bands = [red_band, green_band, blue_band]
+    
+    scaling_factors = [configuration[b] if b in configuration.keys() else [[0, 3000, 0, 255]] for b in bands]
     
     items = []
     assets_href = []
@@ -72,7 +80,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         #ds = gdal.Translate(f'/vsimem/inmem_{index}.vrt', 
         ds = gdal.Translate('{}__{}.tif'.format(index, bands[index]),  
                             asset, 
-                            scaleParams=[[0,3000,0,255]],
+                            scaleParams=scaling_factors[index],
                             outputType=gdal.GDT_Byte)
         
         ds = gdal.Translate('{}_{}.tif'.format(index, bands[index]), 
