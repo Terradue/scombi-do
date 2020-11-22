@@ -14,9 +14,9 @@ profiles:
        band_count: 3
        color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35' 
        expression: 
-         - '(/ v1 10000)'
-         - '(/ v2 10000)'
-         - '(/ v3 10000)'
+         - '(interp v1 (asarray 0 10000) (asarray 0 1))'
+         - '(interp v2 (asarray 0 10000) (asarray 0 1))'
+         - '(interp v3 (asarray 0 10000) (asarray 0 1))'
     'sar_composite_ratio':
        band_count: 2
        expression: 
@@ -31,5 +31,5 @@ profiles:
        band_count: 1
        color: {}
        expression:
-         - '(interp v (asarray -5 15) (asarray 0 1))'
+         - '(interp v1 (asarray -5 15) (asarray 0 1))'
      

@@ -1,6 +1,6 @@
-red-channel-input: {'class': 'Directory', 'path': '2tpgmplm/'}
+red-channel-input: {'class': 'Directory', 'path': 'docker_tmp8kse3gd5/'}
 red-band: 'nir'
-green-channel-input: {'class': 'Directory', 'path': '2tpgmplm/'}
+green-channel-input: {'class': 'Directory', 'path': 'docker_tmp8kse3gd5/'}
 green-band: 'red'
 resolution: 'highest'
 aoi: 'POLYGON((136.707 -35.991,136.707 -35.804,137.071 -35.804,137.071 -35.991,136.707 -35.991))'

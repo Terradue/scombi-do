@@ -115,80 +115,79 @@ def pimp_2(ds, out_tif, s_expressions):
     return True
 
 
-def me(in_tif, out_tif, bands, configuration): #='Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'):
-    
-    scaling_factor = 10000
-    
+def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'):
+
+    bands = [band for band in bands if band]
+
+    logging.info(len(bands))
+    # read the input tif, it's the VRT
     ds = gdal.Open(in_tif)
-    
-    
-    
-    print(ds.RasterCount)
-    
-    if ds.RasterCount == 3:
-        
-        pimp_3(ds, out_tif, s_expressions, ops)
-        
-        return True
-    
-    if ds.RasterCount == 2:
-        
-        pimp_2(ds, out_tif, s_expressions)
-        
-        return True
-    
-        
-        #arr = np.stack([snuggs.eval(s_expressions[b], 
-         #                           v=ds.GetRasterBand(b+1).ReadAsArray()) for b in [0, 1, 2]])
-        
-    #for _input in inputs:
-        
-    #    ds.append(gdal.Open(_input))
-    
-    # snuggs.eval("(+ (asarray 1 1) b)", b=np.array([2, 2]))
-    
-    # apply the s expression to numpy array 
-    
-    
-    #arr = np.stack([ds.GetRasterBand(b).ReadAsArray() / scaling_factor for b in [1, 2, 3]])
-    
-    #ds = None
-    
-    #del(ds)
-    
-#     if ops is not None:
-        
-#         arr = np.clip(arr, 0, 1)
+    width = ds.RasterXSize
+    height = ds.RasterYSize
 
-#         assert arr.shape[0] == 3
-#         assert arr.min() >= 0
-#         assert arr.max() <= 1
+    input_geotransform = ds.GetGeoTransform()
+    input_georef = ds.GetProjectionRef()
 
-
-#         for func in parse_operations(ops):
-#             arr = func(arr) 
-        
-#     # save
-#     driver = gdal.GetDriverByName('GTiff')
-
-#     output = driver.Create(out_tif, 
-#                            width, 
-#                            height, 
-#                            3, 
-#                            gdal.GDT_Byte)
-
-#     output.SetGeoTransform(input_geotransform)
-#     output.SetProjection(input_georef)
-#     output.GetRasterBand(1).WriteArray((arr[0] * 255).astype(np.int))
-#     output.GetRasterBand(2).WriteArray((arr[1] * 255).astype(np.int))
-#     output.GetRasterBand(3).WriteArray((arr[2] * 255).astype(np.int))
-#     output.FlushCache()
-
-#     sleep(5)
-
-#     output = None
-
-#     del(output)
-   
+    # the lenght of bands (same as ds.RasterCount) tells us how many inputs we have
+    ctx = dict()
     
+    ctx['v1'] = ds.GetRasterBand(1).ReadAsArray() 
+
+    if len(bands) > 1:
+
+        ctx['v2'] = ds.GetRasterBand(2).ReadAsArray()
+
+    if len(bands) == 3:
+
+        ctx['v3'] = ds.GetRasterBand(3).ReadAsArray()
+
+    logging.info(ctx)
+
+    ds = None
+    
+    del(ds)
+
+    # apply the expressions to the bands
+    arr = np.stack([snuggs.eval(s_expression, **ctx) for s_expression in s_expressions])
+
+    # apply the color operations using rio color
+    if ops is not None:
+        
+        #arr = np.clip(arr, 0, 1)
+
+        assert arr.shape[0] == 3
+        assert arr.min() >= 0
+        assert arr.max() <= 1
+
+        logging.info('Applying color operations: {}'.format(ops))
+        
+        for func in parse_operations(ops):
+            arr = func(arr) 
+
+    # save
+    driver = gdal.GetDriverByName('GTiff')
+
+    output = driver.Create(out_tif, 
+                           width, 
+                           height, 
+                           len(s_expressions), 
+                           gdal.GDT_Byte)
+
+    output.SetGeoTransform(input_geotransform)
+    output.SetProjection(input_georef)
+
+    for index in range(1, len(s_expressions)+1):
+
+        logging.info('Adding band {} of {}'.format(index, len(s_expressions)))
+
+        output.GetRasterBand(index).WriteArray((arr[index-1] * 255).astype(np.int))
+
+    output.FlushCache()
+
+    sleep(5)
+
+    output = None
+
+    del(output)
+
     return True

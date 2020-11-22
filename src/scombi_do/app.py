@@ -183,8 +183,8 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     #               options=translate_options)
     
     logging.info('Pimp me')
-    
-    me(vrt, f'{target_dir}/combi.tif', bands, configuration['profiles'][profile])
+    # (in_tif, out_tif, bands, s_expressions, ops)
+    me(vrt, f'{target_dir}/combi.tif', bands, s_expressions, color)
     
     #temp_mem = '/vsimem/inmem'
     
