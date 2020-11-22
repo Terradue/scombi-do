@@ -15,12 +15,12 @@ $graph:
       inputBinding:
         position: 2
         prefix: --green-channel-input
-      type: Directory
+      type: Directory?
     inp3:
       inputBinding:
         position: 3
         prefix: --blue-channel-input
-      type: Directory
+      type: Directory?
     inp4:
       inputBinding:
         position: 4
@@ -30,12 +30,12 @@ $graph:
       inputBinding:
         position: 5
         prefix: --green-band
-      type: string
+      type: string?
     inp6:
       inputBinding:
         position: 6
         prefix: --blue-band
-      type: string
+      type: string?
     inp7:
       inputBinding:
         position: 7
@@ -48,9 +48,14 @@ $graph:
       type: string?
     inp9:
       inputBinding:
-        position: 8
+        position: 9
         prefix: --color_expression
-      type: string?  
+      type: string? 
+    inp10:
+      inputBinding:
+        position: 10
+        prefix: --profile
+      type: string?
   outputs:
     results:
       outputBinding:
@@ -62,7 +67,7 @@ $graph:
         PATH: /srv/conda/envs/env_scombi_do/bin/:/opt/anaconda/envs/env_scombi_do/bin:/opt/anaconda/bin:/usr/share/java/maven/bin:/opt/anaconda/bin:/opt/anaconda/envs/notebook/bin:/opt/anaconda/bin:/usr/share/java/maven/bin:/opt/anaconda/bin:/opt/anaconda/condabin:/opt/anaconda/bin:/usr/lib64/qt-3.3/bin:/usr/share/java/maven/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
         PREFIX: /opt/anaconda/envs/scombi_do
     ResourceRequirement: {}
-  stderr: std.err
+#  stderr: std.err
   stdout: std.out
 - class: Workflow
   doc: This step combines three bands as an RGB composite
@@ -75,11 +80,11 @@ $graph:
     green-channel-input:
       doc: EO product for green channel
       label: EO product for green channel
-      type: Directory
+      type: Directory?
     blue-channel-input:
       doc: EO product for blue channel
       label: EO product for blue channel
-      type: Directory
+      type: Directory?
     red-band:
       doc: Common band name for red channel input
       label: Common band name for red channel input
@@ -87,11 +92,11 @@ $graph:
     green-band:
       doc: Common band name for green channel input
       label: Common band name for green channel input
-      type: string
+      type: string?
     blue-band:
       doc: Common band name for blue channel input
       label: Common band name for blue channel input
-      type: string    
+      type: string?    
     resolution:
       doc: Resolution approach
       label: Resolution approach
@@ -104,7 +109,10 @@ $graph:
       doc: Color expression
       label: Area of interest
       type: string?
-
+    profile:
+      doc: profile expression
+      label: profile
+      type: string?
   label: Band combination
   outputs:
   - id: wf_outputs
@@ -124,6 +132,7 @@ $graph:
         inp7: resolution
         inp8: aoi
         inp9: color
+        inp10: profile
       out:
       - results
       run: '#clt'

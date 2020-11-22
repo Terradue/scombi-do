@@ -1,9 +1,8 @@
 red-channel-input: {'class': 'Directory', 'path': '2tpgmplm/'}
+red-band: 'nir'
 green-channel-input: {'class': 'Directory', 'path': '2tpgmplm/'}
-blue-channel-input: {'class': 'Directory', 'path': '2tpgmplm/'}
-red-band: 'red'
-green-band: 'green'
-blue-band: 'blue'
+green-band: 'red'
 resolution: 'highest'
 aoi: 'POLYGON((136.707 -35.991,136.707 -35.804,137.071 -35.804,137.071 -35.991,136.707 -35.991))'
-color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35'
+#color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35'
+profile: 'normalized_difference'

@@ -4,6 +4,32 @@ coastal: [[0,3000,0,255]]
 #blue: [[0,3000,0,255]]
 #red: [[0,3000,0,255]]
 nir: [[0,3000,0,255]]
+red: '(/ v 10000)'
+green: '(/ v 10000)'
+blue: '(/ v 10000)' # apply scalling factor
+sigma_vv_sb: '(interp v (asarray -5 15) (asarray 0 1))' # clip and rescale
 
 profiles:
-    'red,green,blue': 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35' 
+    'composite':
+       band_count: 3
+       color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35' 
+       expression: 
+         - '(/ v1 10000)'
+         - '(/ v2 10000)'
+         - '(/ v3 10000)'
+    'sar_composite_ratio':
+       band_count: 2
+       expression: 
+         - '(* v1 1)'
+         - '(* v2 1)'
+         - '(/ v1 v2)'
+    'normalized_difference':
+       band_count: 2
+       expression:
+         - '(interp (/ (- v1 v2) (+ v1 v2)) (asarray -1 1) (asarray 0 1))'
+    'sigma0_vv_db':
+       band_count: 1
+       color: {}
+       expression:
+         - '(interp v (asarray -5 15) (asarray 0 1))'
+     

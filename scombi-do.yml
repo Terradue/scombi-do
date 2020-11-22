@@ -1,6 +1,6 @@
-red-channel-input: {'class': 'Directory', 'path': 'iic2h1fl/'}
-green-channel-input: {'class': 'Directory', 'path': '5cwj8w5a/'}
-blue-channel-input: {'class': 'Directory', 'path': '6y5nd4hw/'}
+red-channel-input: {'class': 'Directory', 'path': './wyod7t1v/'}
+green-channel-input: {'class': 'Directory', 'path': './lf_qc0a2/'}
+blue-channel-input: {'class': 'Directory', 'path': './2tpgmplm/'}
 red-band: 'red'
 green-band: 'green'
 blue-band: 'blue'

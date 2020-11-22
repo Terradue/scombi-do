@@ -17,16 +17,17 @@ logging.basicConfig(stream=sys.stderr,
 
 @click.command()
 @click.option('--red-channel-input', '-r', 'red_channel_input', help='')
-@click.option('--green-channel-input', '-g', 'green_channel_input', help='')
-@click.option('--blue-channel-input', '-b', 'blue_channel_input', help='')
+@click.option('--green-channel-input', '-g', 'green_channel_input', default=None, help='')
+@click.option('--blue-channel-input', '-b', 'blue_channel_input', default=None, help='')
 @click.option('--red-band', 'red_band', help='')
-@click.option('--green-band', 'green_band', help='')
-@click.option('--blue-band', 'blue_band', help='')
+@click.option('--green-band', 'green_band', default=None, help='')
+@click.option('--blue-band', 'blue_band', default=None, help='')
 @click.option('--aoi', '-a', 'aoi', default=None, help='')
 @click.option('--conf', default=None)
 @click.option('--resolution', 'resolution', default='highest', help='highest, lowest, average')
 @click.option('--color_expression', 'color', default=None, help='Color expression')
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color):
+@click.option('--profile', 'profile', help='Profile')
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile):
     
     main(red_channel_input, 
          green_channel_input, 
@@ -37,10 +38,11 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          aoi, 
          resolution,
          conf,
-        color)
+        color,
+        profile)
 
 
-def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color):
+def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile):
  
 
     configuration = read_configuration(conf)
@@ -63,21 +65,41 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     if color is None:
         
         try: 
-            color = configuration['profiles'][','.join(bands)]
-            logging.info('Using profile for {} from configuration'.format(','.join(bands)))
+            print(','.join([band for band in bands if band]))
+            color = configuration['profiles'][','.join([band for band in bands if band])]['color']
+            logging.info('Using profile for {} from configuration'.format(','.join([band for band in bands if band])))
         except KeyError:
             # no profile, stick to data automatic scaling to [0, 255]
             pass
-            
-        
-    scaling_factors = [configuration[b] if b in configuration.keys() else None for b in bands]
     
+    s_expressions = None
+    
+    try: 
+        s_expressions = configuration['profiles'][profile]['expression']
+        if s_expressions is not None:
+            logging.info('Using s expressions from profile')
+    except KeyError:
+        pass
+    
+    if s_expressions is None:
+        try: 
+            s_expressions = [configuration[b] if b in configuration.keys() else None for b in bands]
+            logging.info('Using s expressions from bands'.format(','.join([band for band in bands if band])))
+        except KeyError:
+            pass
+        
     items = []
     assets_href = []
     rescaled = []
     
     for index, input_path in enumerate([red_channel_input, green_channel_input, blue_channel_input]):
     
+        if input_path is None:
+            
+            items.append(None)
+            assets_href.append(None)
+            continue
+            
         item = get_item(os.path.join(input_path, 'catalog.json')) 
         
         logging.info(item)
@@ -91,7 +113,13 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
     for index, asset in enumerate(assets_href):
 
-        logging.info('Getting band {}'.format(bands[index]))
+        if asset is None:
+            
+            rescaled.append(None)
+            
+            continue
+            
+        logging.info('Getting band {} from {}'.format(bands[index], asset))
         if aoi is not None:
         
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
@@ -100,7 +128,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
             #vsi_mem = '/vsimem/{}_inmem_{}.vrt'.format(index, bands[index])
             ds = gdal.Translate(output_name, 
                                 asset, 
-                                scaleParams=scaling_factors[index],
+                                #scaleParams=scaling_factors[index],
                                 outputType=gdal.GDT_Int16,
                                 projWin=[min_lon, max_lat, max_lon, min_lat],
                                 projWinSRS='EPSG:4326')
@@ -119,7 +147,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
             #vsi_mem = '/vsimem/{}_inmem_{}.vrt'.format(index, bands[index])
             ds = gdal.Translate(output_name, 
                                 asset, 
-                                scaleParams=scaling_factors[index],
+                                #scaleParams=scaling_factors[index],
                                 outputType=gdal.GDT_Int16)
 
         rescaled.append(ds)
@@ -135,7 +163,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     logging.info('Build VRT')
     vrt = 'temp.vrt'
     ds = gdal.BuildVRT(vrt,
-                       rescaled,
+                       [ds for ds in rescaled if ds],
                        srcNodata=0,
                        resolution=resolution, 
                        separate=True)
@@ -156,7 +184,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
     logging.info('Pimp me')
     
-    me(vrt, f'{target_dir}/combi.tif', color)
+    me(vrt, f'{target_dir}/combi.tif', bands, configuration['profiles'][profile])
     
     #temp_mem = '/vsimem/inmem'
     
@@ -171,7 +199,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     
     
 
-    os.remove(vrt)
+    #os.remove(vrt)
     
     # to STAC
     logging.info('STAC')
@@ -189,7 +217,8 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
     eo_item = extensions.eo.EOItemExt(item)
 
     for index, asset in enumerate(assets_href):
-
+        if asset is None:
+            continue
         _asset =  get_band_asset(items[index],
                                  bands[index]) 
       
