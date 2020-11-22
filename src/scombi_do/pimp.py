@@ -6,6 +6,7 @@ import os
 import sys
 import snuggs
 import logging
+from matplotlib import cm
 
 logging.basicConfig(stream=sys.stderr, 
                     level=logging.DEBUG,
@@ -115,7 +116,7 @@ def pimp_2(ds, out_tif, s_expressions):
     return True
 
 
-def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'):
+def me(in_tif, out_tif, bands, s_expressions, ops, lut=None): #='Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'):
 
     bands = [band for band in bands if band]
 
@@ -141,11 +142,9 @@ def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 
 
         ctx['v3'] = ds.GetRasterBand(3).ReadAsArray()
 
-    logging.info(ctx)
+    #logging.info(ctx)
 
-    ds = None
     
-    del(ds)
 
     # apply the expressions to the bands
     arr = np.stack([snuggs.eval(s_expression, **ctx) for s_expression in s_expressions])
@@ -162,7 +161,17 @@ def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 
         logging.info('Applying color operations: {}'.format(ops))
         
         for func in parse_operations(ops):
+
             arr = func(arr) 
+
+    if lut is not None:
+        logging.info('Applying look-up table')
+        temp_arr = cm.get_cmap(lut)(arr)
+
+        arr = np.array([temp_arr[0][:,:,0],
+                        temp_arr[0][:,:,1],
+                        temp_arr[0][:,:,2]])
+
 
     # save
     driver = gdal.GetDriverByName('GTiff')
@@ -170,15 +179,16 @@ def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 
     output = driver.Create(out_tif, 
                            width, 
                            height, 
-                           len(s_expressions), 
+                           arr.shape[0], 
                            gdal.GDT_Byte)
 
     output.SetGeoTransform(input_geotransform)
     output.SetProjection(input_georef)
 
-    for index in range(1, len(s_expressions)+1):
 
-        logging.info('Adding band {} of {}'.format(index, len(s_expressions)))
+    for index in range(1, arr.shape[0]+1):
+
+        logging.info('Adding band {} of {}'.format(index, arr.shape[0]))
 
         output.GetRasterBand(index).WriteArray((arr[index-1] * 255).astype(np.int))
 
@@ -189,5 +199,9 @@ def me(in_tif, out_tif, bands, s_expressions, ops): #='Gamma RGB 3.5 Saturation 
     output = None
 
     del(output)
+    
+    ds = None
+    
+    del(ds)
 
     return True

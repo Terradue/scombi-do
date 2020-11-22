@@ -1,13 +1,3 @@
-coastal: [[0,3000,0,255]]
-#red: [[0,3000,0,255]]
-#green: [[0,3000,0,255]]
-#blue: [[0,3000,0,255]]
-#red: [[0,3000,0,255]]
-nir: [[0,3000,0,255]]
-red: '(/ v 10000)'
-green: '(/ v 10000)'
-blue: '(/ v 10000)' # apply scalling factor
-sigma_vv_sb: '(interp v (asarray -5 15) (asarray 0 1))' # clip and rescale
 
 profiles:
     'composite':

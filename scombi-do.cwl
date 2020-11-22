@@ -56,6 +56,11 @@ $graph:
         position: 10
         prefix: --profile
       type: string?
+    inp11:
+      inputBinding:
+        position: 11
+        prefix: --lut
+      type: string?
   outputs:
     results:
       outputBinding:
@@ -113,6 +118,10 @@ $graph:
       doc: profile expression
       label: profile
       type: string?
+    lut:
+      doc: lut
+      label: lut
+      type: string?
   label: Band combination
   outputs:
   - id: wf_outputs
@@ -133,6 +142,7 @@ $graph:
         inp8: aoi
         inp9: color
         inp10: profile
+        inp11: lut
       out:
       - results
       run: '#clt'

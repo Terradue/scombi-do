@@ -7,7 +7,7 @@ from pystac import *
 from shapely.wkt import loads
 from .helpers import *
 from .conf import read_configuration
-from .pimp import me
+from . import pimp 
 
 logging.basicConfig(stream=sys.stderr, 
                     level=logging.DEBUG,
@@ -27,7 +27,8 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--resolution', 'resolution', default='highest', help='highest, lowest, average')
 @click.option('--color_expression', 'color', default=None, help='Color expression')
 @click.option('--profile', 'profile', help='Profile')
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile):
+@click.option('--lut', 'lut', default=None, help='Matplotlib colormap')
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut):
     
     main(red_channel_input, 
          green_channel_input, 
@@ -39,10 +40,11 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          resolution,
          conf,
         color,
-        profile)
+        profile,
+        lut)
 
 
-def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile):
+def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut):
  
 
     configuration = read_configuration(conf)
@@ -125,41 +127,20 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
         
             output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
-            #vsi_mem = '/vsimem/{}_inmem_{}.vrt'.format(index, bands[index])
             ds = gdal.Translate(output_name, 
                                 asset, 
-                                #scaleParams=scaling_factors[index],
                                 outputType=gdal.GDT_Int16,
                                 projWin=[min_lon, max_lat, max_lon, min_lat],
                                 projWinSRS='EPSG:4326')
-
- 
-
-            # copy the original bands to allow titiling 
-            #ds = gdal.Translate('{}/{}_{}.tif'.format(target_dir, index+1, bands[index]), 
-            #                    asset,
-            #                    outputType=gdal.GDT_Int16,
-            #                    projWin=[min_lon, max_lat, max_lon, min_lat],
-            #                    projWinSRS='EPSG:4326')
         
         else:
-            
-            #vsi_mem = '/vsimem/{}_inmem_{}.vrt'.format(index, bands[index])
             ds = gdal.Translate(output_name, 
                                 asset, 
-                                #scaleParams=scaling_factors[index],
                                 outputType=gdal.GDT_Int16)
 
         rescaled.append(ds)
-
-            # copy the original bands to allow titiling 
-            #ds = gdal.Translate('{}/{}_{}.tif'.format(target_dir, index+1, bands[index]), 
-            #                    asset,
-            #                    outputType=gdal.GDT_Int16)
     
     # build a VRT with the rescaled assets with the selected resolution mode
-    
-    
     logging.info('Build VRT')
     vrt = 'temp.vrt'
     ds = gdal.BuildVRT(vrt,
@@ -169,37 +150,15 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
                        separate=True)
 
     ds.FlushCache()
-
-    ds = None
-
-    del(ds)
-
-    #translate_options = gdal.TranslateOptions(gdal.ParseCommandLine('-co TILED=YES ' \
-    #                                                                '-co COPY_SRC_OVERVIEWS=YES ' \
-    #                                                                '-co COMPRESS=DEFLATE '))
-    
-    #gdal.Translate(f'{target_dir}/_combi.tif',
-    #               vrt,
-    #               options=translate_options)
     
     logging.info('Pimp me')
     # (in_tif, out_tif, bands, s_expressions, ops)
-    me(vrt, f'{target_dir}/combi.tif', bands, s_expressions, color)
-    
-    #temp_mem = '/vsimem/inmem'
+    pimp.me(vrt, f'{target_dir}/combi.tif', bands, s_expressions, color, lut)
     
     logging.info('COGify and saving results')
     
-    
-    
-    #gdal.Translate(f'{target_dir}/combi.tif',
-    #                   vrt,
-    #                   outputType=gdal.GDT_Byte,
-    #                   options=translate_options)
-    
-    
-
-    #os.remove(vrt)
+    ds = None
+    del(ds)
     
     # to STAC
     logging.info('STAC')
