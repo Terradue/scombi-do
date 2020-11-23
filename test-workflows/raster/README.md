@@ -9,7 +9,7 @@ This CWL workflow takes a local STAC catalog to produce an RGB composite describ
 * `green-band`: the band common name to use for the RGB composition green channel - Mandatory
 * `blue-band`: the band common name to use for the RGB composition blue channel - Mandatory
 * `aoi`: the area of interest expressed as a WKT expression - Optional
-* `color`: the color manipulation operations (see https://github.com/mapbox/rio-color) 
+* `color`: the color manipulation operations (see https://github.com/mapbox/rio-color) - Optional
 
 Example:
 
@@ -60,6 +60,12 @@ Test the installation with:
 ```console
 scombi-do --help
 ```
+
+### Data stage-in
+
+Use the stage-in as described in the project README.
+
+Update the `scombi-do-raster.yml` file `input_reference` parameter with the staged path.
 
 ### Running
 
