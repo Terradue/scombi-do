@@ -1,27 +1,17 @@
-# Raster
+# SAR Raster
 
-This CWL workflow takes a local STAC catalog to produce an RGB composite described as a local STAC catalog.
-
-It relies on the common band names for selecting the bands for the RGB composite channels.
+This CWL workflow takes a local STAC catalog to produce an 8 byte image out of a calibrated SAR product.
 
 ## Inputs
 
-* `input_reference`: the folder containing the local STAC catalog
-* `red-band`: the band common name to use for the RGB composition red channel - Mandatory
-* `green-band`: the band common name to use for the RGB composition green channel - Mandatory
-* `blue-band`: the band common name to use for the RGB composition blue channel - Mandatory
+* `input_reference`: the folder containing the local STAC catalog with an item including a 'sigma0_vv_db' asset
 * `aoi`: the area of interest expressed as a WKT expression - Optional
-* `color`: the color manipulation operations (see https://github.com/mapbox/rio-color) - Optional
 
 Example:
 
 ```yaml
 input_reference: {'class': 'Directory', 'path': '/Users/fbrito/Documents/scombi-do/docker_tmpxcy75c4k/'}
-red-band: 'red'
-green-band: 'green'
-blue-band: 'blue'
 aoi: 'POLYGON((136.707 -35.991,136.707 -35.804,137.071 -35.804,137.071 -35.991,136.707 -35.991))'
-color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'
 ```
 
 ## Execution 
@@ -72,5 +62,5 @@ Update the `scombi-do-raster.yml` file `input_reference` parameter with the stag
 ### Running
 
 ```console
-cwltool --no-container scombi-do-raster.cwl#scombi-do-raster scombi-do-raster.yml
+cwltool --no-container scombi-do-raster.cwl#scombi-do-sigma0-raster scombi-do-sigma0-raster.yml
 ``` 
