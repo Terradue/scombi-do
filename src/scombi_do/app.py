@@ -102,36 +102,6 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
     if not os.path.exists(target_dir):
     
         os.mkdir(target_dir)
-    
-    # read the inputs: bands, items and assets
-    #bands = [red_band, green_band, blue_band]
-    
-    # check the color profile:
-    # if color is None:
-        
-    #     try: 
-    #         print(','.join([band for band in bands if band]))
-    #         color = configuration['profiles'][','.join([band for band in bands if band])]['color']
-    #         logging.info('Using profile for {} from configuration'.format(','.join([band for band in bands if band])))
-    #     except KeyError:
-    #         # no profile, stick to data automatic scaling to [0, 255]
-    #         pass
-    
-    # s_expressions = None
-    
-    # try: 
-    #     s_expressions = configuration['profiles'][profile]['expression']
-    #     if s_expressions is not None:
-    #         logging.info('Using s expressions from profile')
-    # except KeyError:
-    #     pass
-    
-    # if s_expressions is None:
-    #     try: 
-    #         s_expressions = [configuration[b] if b in configuration.keys() else None for b in bands]
-    #         logging.info('Using s expressions from bands'.format(','.join([band for band in bands if band])))
-    #     except KeyError:
-    #         pass
         
     items = []
     assets_href = []
