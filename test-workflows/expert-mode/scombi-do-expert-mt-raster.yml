@@ -1,0 +1,13 @@
+input_reference_1: {'class': 'Directory', 'path': '/Users/fbrito/Documents/scombi-do/docker_tmp9tzr20rn/'}
+input_reference_2: {'class': 'Directory', 'path': '/Users/fbrito/Documents/scombi-do/docker_tmpxcy75c4k'}
+input_reference_3: {'class': 'Directory', 'path': '/Users/fbrito/Documents/scombi-do/docker_tmpzs0cfpus'}
+band_1: 'red'
+band_2: 'green'
+band_3: 'blue'
+resolution: 'highest'
+aoi: 'POLYGON((136.707 -35.991,136.707 -35.804,137.071 -35.804,137.071 -35.991,136.707 -35.991))'
+color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'
+s_expression: 
+    - '(interp v1 (asarray 0 10000) (asarray 0 1))'
+    - '(interp v2 (asarray 0 10000) (asarray 0 1))'
+    - '(interp v3 (asarray 0 10000) (asarray 0 1))'

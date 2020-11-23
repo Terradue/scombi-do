@@ -1,6 +1,8 @@
 # Raster
 
-This CWL workflow takes a local STAC catalog to produce an RGB composite describe as a local STAC catalog
+This CWL workflow takes a local STAC catalog to produce an RGB composite described as a local STAC catalog.
+
+It relies on the common band names for selecting the bands for the RGB composite channels.
 
 ## Inputs
 
