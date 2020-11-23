@@ -33,6 +33,6 @@ profiles:
        band_count: 3
        color: {}
        expression:
-         - '(* v3 (asarray 1))'
-         - '(mean (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'
-         - '(- (interp v2 (asarray -15 5) (asarray 0 1)) (interp v1 (asarray -15 5) (asarray 0 1)))'
+         - '(* v3 1)' 
+         - '(/ (+ (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1))) 2)'
+         - '(- (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'

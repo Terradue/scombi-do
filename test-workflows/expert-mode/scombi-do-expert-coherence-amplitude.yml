@@ -5,6 +5,7 @@ band_1: 'sigma0_vv_db'
 band_2: 'sigma0_vv_db'
 band_3: 'coherence'
 s_expression: 
-    - '(* v3 1)' #  '(interp v3 (asarray 0 1) (asarray 0 1))'
-    - '(/ (+ v1 v2) 2)' #'(mean (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'
-    - '(- v1 v2)' #'(interp v2 (asarray -15 5) (asarray 0 1))' #'(- (interp v2 (asarray -15 5) (asarray 0 1)) (interp v1 (asarray -15 5) (asarray 0 1)))'
+    - '(* v3 1)' 
+    - '(/ (+ (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1))) 2)'
+    - '(- (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'
+  

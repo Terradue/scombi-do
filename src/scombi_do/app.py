@@ -138,11 +138,11 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
         logging.info('Getting band {} from {}'.format(bands[index], asset))
         
         output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
-        
+
         if aoi is not None:
 
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
-        
+            
             ds = gdal.Translate(output_name, 
                                 asset, 
                                 outputType=gdal.GDT_Int16,
