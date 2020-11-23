@@ -1,3 +1,4 @@
+docker_tmp*
 .ipynb_checkpoints
 target
 *.data

@@ -26,34 +26,77 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--conf', default=None)
 @click.option('--resolution', 'resolution', default='highest', help='highest, lowest, average')
 @click.option('--color_expression', 'color', default=None, help='Color expression')
-@click.option('--profile', 'profile', help='Profile')
+@click.option('--profile', 'profile', default=None, help='Profile')
 @click.option('--lut', 'lut', default=None, help='Matplotlib colormap')
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut):
+@click.option('--s_expression', 's_expression', multiple=True, default=None)
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut, s_expression):
     
-    main(red_channel_input, 
-         green_channel_input, 
-         blue_channel_input, 
-         red_band, 
-         green_band, 
-         blue_band, 
-         aoi, 
-         resolution,
-         conf,
-        color,
-        profile,
-        lut)
-
-
-def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut):
- 
+    logging.info('Scombidooo!')
 
     configuration = read_configuration(conf)
 
+    s_expressions = None
+
+    if s_expression:
+
+        s_expressions = list(s_expression)
+        logging.info('Using s expressions: {}'.format(','.join(s_expressions)))
+
+    if not s_expressions: 
+
+        if profile:
+
+            try: 
+                s_expressions = configuration['profiles'][profile]['expression']
+                if s_expressions is not None:
+                    logging.info('Using s expressions from profile: {}'.format(','.join(s_expressions)))
+            except KeyError:
+                
+                print('Provide a profile or one or more s expressions')
+                sys.exit(1)
+        else:
+
+            print('Provide a profile or one or more s expressions')
+            sys.exit(1)
+
+    print(s_expressions)
+
+    # get the color profile via CLI parameter or via configuration
+    if color is None:
+        
+        try: 
+            color = configuration['profiles'][profile]['color']
+            logging.info('Using color enhancement for profile "{}" from configuration: {}'.format(profile, color))
+        except KeyError:
+            logging.info('No profile or color expression provided, results are provided without enhancement')
+
+    # read the inputs: bands, items and assets
+    bands = [red_band, green_band, blue_band]
+
+    channel_inputs = [red_channel_input, green_channel_input, blue_channel_input]
+
+    # an empty string AOI becomes None (CWL params policy) 
     if aoi == '': 
         aoi = None
-        
-    logging.info('Scombidooo!')
-    
+
+    print('channel_inputs ', channel_inputs)
+    print('bands ', bands)
+    print('profile ', profile)
+    print('color ', color)
+
+
+    main(channel_inputs=channel_inputs,
+         bands=bands,
+         configuration=configuration,
+         s_expressions=s_expressions, 
+         resolution=resolution,
+         aoi=aoi, 
+         color=color,
+         profile=profile,
+         lut=lut)
+
+def main(channel_inputs, bands, configuration, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None):
+
     target_dir = 'combi'
     
     if not os.path.exists(target_dir):
@@ -61,40 +104,41 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
         os.mkdir(target_dir)
     
     # read the inputs: bands, items and assets
-    bands = [red_band, green_band, blue_band]
+    #bands = [red_band, green_band, blue_band]
     
     # check the color profile:
-    if color is None:
+    # if color is None:
         
-        try: 
-            print(','.join([band for band in bands if band]))
-            color = configuration['profiles'][','.join([band for band in bands if band])]['color']
-            logging.info('Using profile for {} from configuration'.format(','.join([band for band in bands if band])))
-        except KeyError:
-            # no profile, stick to data automatic scaling to [0, 255]
-            pass
+    #     try: 
+    #         print(','.join([band for band in bands if band]))
+    #         color = configuration['profiles'][','.join([band for band in bands if band])]['color']
+    #         logging.info('Using profile for {} from configuration'.format(','.join([band for band in bands if band])))
+    #     except KeyError:
+    #         # no profile, stick to data automatic scaling to [0, 255]
+    #         pass
     
-    s_expressions = None
+    # s_expressions = None
     
-    try: 
-        s_expressions = configuration['profiles'][profile]['expression']
-        if s_expressions is not None:
-            logging.info('Using s expressions from profile')
-    except KeyError:
-        pass
+    # try: 
+    #     s_expressions = configuration['profiles'][profile]['expression']
+    #     if s_expressions is not None:
+    #         logging.info('Using s expressions from profile')
+    # except KeyError:
+    #     pass
     
-    if s_expressions is None:
-        try: 
-            s_expressions = [configuration[b] if b in configuration.keys() else None for b in bands]
-            logging.info('Using s expressions from bands'.format(','.join([band for band in bands if band])))
-        except KeyError:
-            pass
+    # if s_expressions is None:
+    #     try: 
+    #         s_expressions = [configuration[b] if b in configuration.keys() else None for b in bands]
+    #         logging.info('Using s expressions from bands'.format(','.join([band for band in bands if band])))
+    #     except KeyError:
+    #         pass
         
     items = []
     assets_href = []
     rescaled = []
     
-    for index, input_path in enumerate([red_channel_input, green_channel_input, blue_channel_input]):
+    for index, input_path in enumerate(channel_inputs):
+    #for index, input_path in enumerate([red_channel_input, green_channel_input, blue_channel_input]):
     
         if input_path is None:
             
@@ -123,7 +167,7 @@ def main(red_channel_input, green_channel_input, blue_channel_input, red_band, g
             
         logging.info('Getting band {} from {}'.format(bands[index], asset))
         if aoi is not None:
-        
+
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
         
             output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])

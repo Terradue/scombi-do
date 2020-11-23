@@ -56,21 +56,16 @@ or
 docker run --rm -it terradue/scombi_do:0.1 scombi-do --help
 ```
 
-## Creating the CWL
+## Data stage-in
 
-Check the examples provided in the `cwl-examples` folder and adapt one to the application requirements
+Use the `stage-in.cwl` document provided to stage three Sentinel-2 acquisitions:
 
-## Setting up the git repository
-
-```bash
-git init
-git remote add origin <git repository URL>
+```console
+cwltool stage-in.cwl stage-in.yml
 ```
 
-Once you're ready to add, commit and push, do:
+Use the folders returned by the execution as parameters when using `scombi-do` 
 
-```bash
-git add -A
-git commit -m 'first commit'
-git push -u origin master
-```
+## scombi-do introduction
+
+
