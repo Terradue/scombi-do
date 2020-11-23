@@ -21,5 +21,18 @@ profiles:
        band_count: 1
        color: {}
        expression:
-         - '(interp v1 (asarray -5 15) (asarray 0 1))'
-     
+         - '(interp v1 (asarray -15 5) (asarray 0 1))'
+    'amplitude_change':
+       band_count: 2
+       color: {}
+       expression:
+         - '(interp v1 (asarray -15 5) (asarray 0 1))'
+         - '(interp v1 (asarray -15 5) (asarray 0 1))'
+         - '(interp v2 (asarray -15 5) (asarray 0 1))'
+    'coherence_amplitude_change':
+       band_count: 3
+       color: {}
+       expression:
+         - '(* v3 (asarray 1))'
+         - '(mean (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'
+         - '(- (interp v2 (asarray -15 5) (asarray 0 1)) (interp v1 (asarray -15 5) (asarray 0 1)))'

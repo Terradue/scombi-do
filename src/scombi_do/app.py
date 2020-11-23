@@ -136,11 +136,13 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
             continue
             
         logging.info('Getting band {} from {}'.format(bands[index], asset))
+        
+        output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
+        
         if aoi is not None:
 
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
         
-            output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
             ds = gdal.Translate(output_name, 
                                 asset, 
                                 outputType=gdal.GDT_Int16,
@@ -179,12 +181,14 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
     cat = Catalog(id='scombidooo',
                   description="Combined RGB composite") 
     
+    # TODO fix geometry, bbox
     item = Item(id='combi',
-            geometry=items[0].geometry,
-            bbox=items[0].bbox,
-            datetime=items[0].datetime,
-            properties={}) #items[0].properties)
+                geometry=items[0].geometry,
+                bbox=items[0].bbox,
+                datetime=items[0].datetime,
+                properties={}) #items[0].properties)
 
+    # TODO fix gsd
     item.common_metadata.set_gsd(10)
 
     eo_item = extensions.eo.EOItemExt(item)

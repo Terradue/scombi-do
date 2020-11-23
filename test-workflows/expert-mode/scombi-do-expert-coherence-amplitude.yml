@@ -1,0 +1,10 @@
+input_reference_1: {'class': 'Directory', 'path': '/Users/fbrito/Downloads/stac-gep-results-coin/A055E03A80DB46CD9696CC74C34C1EF7D54DFADE'}
+input_reference_2: {'class': 'Directory', 'path': '/Users/fbrito/Downloads/stac-gep-results-coin/E149EC05143ED40ADE0C8DC391209A46E9B3C1BB'}
+input_reference_3: {'class': 'Directory', 'path': '/Users/fbrito/Downloads/stac-gep-results-coin/FCC0EFAADAA7DEF53DAD2F6577C4A559ACA665C1'}
+band_1: 'sigma0_vv_db'
+band_2: 'sigma0_vv_db'
+band_3: 'coherence'
+s_expression: 
+    - '(* v3 1)' #  '(interp v3 (asarray 0 1) (asarray 0 1))'
+    - '(/ (+ v1 v2) 2)' #'(mean (interp v1 (asarray -15 5) (asarray 0 1)) (interp v2 (asarray -15 5) (asarray 0 1)))'
+    - '(- v1 v2)' #'(interp v2 (asarray -15 5) (asarray 0 1))' #'(- (interp v2 (asarray -15 5) (asarray 0 1)) (interp v1 (asarray -15 5) (asarray 0 1)))'

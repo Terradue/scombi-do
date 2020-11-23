@@ -1,0 +1,4 @@
+input_reference_1: {'class': 'Directory', 'path': '/Users/fbrito/Downloads/stac-gep-results/EC923E0B8C55B9C3AF9F20E09D0C02A4A35EADE9'}
+band_1: 'sigma0_vv_db'
+s_expression: 
+    - '(interp v1 (asarray -15 5) (asarray 0 1))'
