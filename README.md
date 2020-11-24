@@ -59,6 +59,30 @@ profiles:
 
 #### Composite profile
 
+The `composite` profile is defined as:
+
+```yaml
+'composite':
+       band_count: 3
+       color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35' 
+       expression: 
+         - '(interp v1 (asarray 0 10000) (asarray 0 1))'
+         - '(interp v2 (asarray 0 10000) (asarray 0 1))'
+         - '(interp v3 (asarray 0 10000) (asarray 0 1))'
+```
+
+This profile takes three inputs, one for each RGB channel and:
+- does an interpolation between [0,10000] to [0,1].
+- applies the rio_color expression 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.35' 
+
+#### Normalized difference
+
+```yaml
+    'normalized_difference':
+       band_count: 2
+       expression:
+         - '(interp (/ (- v1 v2) (+ v1 v2)) (asarray -1 1) (asarray 0 1))'
+```
 
 
 ## Development 
