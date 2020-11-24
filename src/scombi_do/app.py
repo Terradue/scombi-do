@@ -3,11 +3,14 @@ import sys
 import logging
 import click
 import gdal
+
 from pystac import *
 from shapely.wkt import loads
 from .helpers import *
 from .conf import read_configuration
 from . import pimp 
+
+import numpy as np
 
 logging.basicConfig(stream=sys.stderr, 
                     level=logging.DEBUG,
@@ -28,8 +31,9 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--color_expression', 'color', default=None, help='Color expression')
 @click.option('--profile', 'profile', default=None, help='Profile')
 @click.option('--lut', 'lut', default=None, help='Matplotlib colormap')
+@click.option('--epsg', 'epsg', default=None, help='Target coordinate system as an EPSG code. Example EPSG:4326')
 @click.option('--s_expression', 's_expression', multiple=True, default=None)
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut, s_expression):
+def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut, s_expression, epsg):
     
     logging.info('Scombidooo!')
 
@@ -93,9 +97,10 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          aoi=aoi, 
          color=color,
          profile=profile,
-         lut=lut)
+         lut=lut,
+         epsg=epsg)
 
-def main(channel_inputs, bands, configuration, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None):
+def main(channel_inputs, bands, configuration, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None, epsg=None):
 
     target_dir = 'combi'
     
@@ -127,41 +132,59 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
     logging.info('Rescaling and COG for input assets')
     rescaled = []
     
-    for index, asset in enumerate(assets_href):
+    # analyze get an EPSG code if it hasn't been supplied
+    # check if warp is needed
+    epsg, epsg_codes = get_epsg(epsg, assets_href)
 
-        if asset is None:
+    # get the data
+    for index, asset_href in enumerate(assets_href):
+
+        if asset_href is None:
             
             rescaled.append(None)
             
             continue
             
-        logging.info('Getting band {} from {}'.format(bands[index], asset))
+        logging.info('Getting band {} from {}'.format(bands[index], asset_href))
         
         output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
+
+        min_lon, min_lat, max_lon, max_lat = None, None, None, None
 
         if aoi is not None:
 
             min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
             
-            ds = gdal.Translate(output_name, 
-                                asset, 
-                                outputType=gdal.GDT_Int16,
-                                projWin=[min_lon, max_lat, max_lon, min_lat],
-                                projWinSRS='EPSG:4326')
-        
-        else:
-            ds = gdal.Translate(output_name, 
-                                asset, 
-                                outputType=gdal.GDT_Int16)
+        if epsg_codes[index] == epsg:
 
-        rescaled.append(ds)
+            ds = gdal.Translate(output_name, 
+                                asset_href, 
+                                outputType=gdal.GDT_Float32,
+                                projWin=[min_lon, max_lat, max_lon, min_lat] if aoi else None,
+                                projWinSRS='EPSG:4326')
+
+        else:
+
+            logging.info('Warp')
+            ds = gdal.Warp(output_name, 
+                        asset_href, 
+                        outputType=gdal.GDT_Float32,
+                        outputBounds=[min_lon, min_lat, max_lon, max_lat] if aoi else None,
+                        outputBoundsSRS='EPSG:4326',
+                        dstSRS=epsg) 
+        
+
+        ds = None
+
+        del(ds)
+        #rescaled.append(ds)
+        rescaled.append(output_name)
     
     # build a VRT with the rescaled assets with the selected resolution mode
     logging.info('Build VRT')
     vrt = 'temp.vrt'
     ds = gdal.BuildVRT(vrt,
                        [ds for ds in rescaled if ds],
-                       srcNodata=0,
                        resolution=resolution, 
                        separate=True)
 
@@ -193,8 +216,8 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
 
     eo_item = extensions.eo.EOItemExt(item)
 
-    for index, asset in enumerate(assets_href):
-        if asset is None:
+    for index, asset_href in enumerate(assets_href):
+        if asset_href is None:
             continue
         _asset =  get_band_asset(items[index],
                                  bands[index]) 

@@ -81,13 +81,17 @@ def me(in_tif, out_tif, bands, s_expressions, ops, lut=None):
 
         logging.info('Adding band {} of {}'.format(index, arr.shape[0]))
 
-        output.GetRasterBand(index).WriteArray((arr[index-1] * 255).astype(np.int))
+        band = output.GetRasterBand(index)
+        
+        band.WriteArray((arr[index-1] * 255).astype(np.int))
 
-    output.FlushCache()
+        output.FlushCache()
 
-    sleep(5)
+        band = None
 
     output = None
+
+    sleep(5)
 
     del(output)
     

@@ -1,9 +1,10 @@
 from pystac import *
 import gdal 
+import osr
 from urllib.parse import urlparse
 import os
 import numpy as np
-
+from collections import Counter
 gdal.UseExceptions()
 
 def set_env():
@@ -107,3 +108,26 @@ def cog(input_tif, output_tif, no_data=None):
         # not using the mem driver, clean-up
         os.remove('{}.ovr'.format(input_tif))
         os.remove(input_tif)
+
+def get_epsg(epsg, assets_href):
+
+    # get an EPSG code if it hasn't been supplied
+    epsg_codes = []
+
+    for index, asset_href in enumerate(assets_href):
+
+        if asset_href is None:
+  
+            epsg_codes.append(None)
+            continue
+        
+        ds = gdal.Open(asset_href)
+        proj = osr.SpatialReference(wkt=ds.GetProjection()).GetAttrValue('AUTHORITY',1)
+      
+        epsg_codes.append(f'EPSG:{proj}')
+
+    if epsg is None:
+        # get the most represented code
+        epsg = Counter([code for code in epsg_codes if code]).most_common(1)[0][0] 
+
+    return epsg, epsg_codes
