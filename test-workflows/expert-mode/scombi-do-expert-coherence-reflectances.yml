@@ -4,7 +4,7 @@ input_reference_3: {'class': 'Directory', 'path': '/Users/fbrito/Downloads/stac-
 band_1: 'red'
 band_2: 'green'
 band_3: 'coherence'
-#aoi: 'POLYGON((106.832 -6.914,106.832 -6.594,107.189 -6.594,107.189 -6.914,106.832 -6.914))'
+aoi: 'POLYGON((106.832 -6.914,106.832 -6.594,107.189 -6.594,107.189 -6.914,106.832 -6.914))'
 color: 'Gamma RGB 3.5 Saturation 1.4 Sigmoidal RGB 15 0.45'
 s_expression: 
     - '(interp v1 (asarray 0 10000) (asarray 0 1))'
