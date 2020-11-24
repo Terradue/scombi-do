@@ -131,3 +131,14 @@ def get_epsg(epsg, assets_href):
         epsg = Counter([code for code in epsg_codes if code]).most_common(1)[0][0] 
 
     return epsg, epsg_codes
+
+def get_mbb(geometries):
+
+    for index, g in enumerate(geometries):
+        
+        if index == 0:
+            mbb = g
+        else:
+            mbb = mbb.intersection(g)
+
+    return mbb

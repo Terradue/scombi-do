@@ -3,7 +3,7 @@ import sys
 import logging
 import click
 import gdal
-
+import json
 from pystac import *
 from shapely.wkt import loads
 from .helpers import *
@@ -11,6 +11,9 @@ from .conf import read_configuration
 from . import pimp 
 
 import numpy as np
+
+from shapely.geometry import shape
+from shapely.geometry import mapping
 
 logging.basicConfig(stream=sys.stderr, 
                     level=logging.DEBUG,
@@ -127,15 +130,21 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
         
         items.append(item)
         assets_href.append(get_band_asset_href(item, bands[index]))
-    
-    # rescale and get the original assets (these are part of the output)
-    logging.info('Rescaling and COG for input assets')
-    rescaled = []
-    
+
+    # define AOI, if none is supplied, get the minimum bbox 
+    if aoi is None:
+        aoi = get_mbb([shape(item.geometry) for item in items]).wkt
+
+    min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
+
     # analyze get an EPSG code if it hasn't been supplied
     # check if warp is needed
     epsg, epsg_codes = get_epsg(epsg, assets_href)
 
+    # rescale and get the original assets (these are part of the output)
+    logging.info('Rescaling and COG for input assets')
+    rescaled = []
+    
     # get the data
     for index, asset_href in enumerate(assets_href):
 
@@ -149,18 +158,13 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
         
         output_name = '{}/{}_{}.tif'.format(target_dir, index+1, bands[index])
 
-        min_lon, min_lat, max_lon, max_lat = None, None, None, None
-
-        if aoi is not None:
-
-            min_lon, min_lat, max_lon, max_lat = loads(aoi).bounds
-            
+        
         if epsg_codes[index] == epsg:
 
             ds = gdal.Translate(output_name, 
                                 asset_href, 
                                 outputType=gdal.GDT_Float32,
-                                projWin=[min_lon, max_lat, max_lon, min_lat] if aoi else None,
+                                projWin=[min_lon, max_lat, max_lon, min_lat],
                                 projWinSRS='EPSG:4326')
 
         else:
@@ -169,7 +173,7 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
             ds = gdal.Warp(output_name, 
                         asset_href, 
                         outputType=gdal.GDT_Float32,
-                        outputBounds=[min_lon, min_lat, max_lon, max_lat] if aoi else None,
+                        outputBounds=[min_lon, min_lat, max_lon, max_lat],
                         outputBoundsSRS='EPSG:4326',
                         dstSRS=epsg) 
         
@@ -190,12 +194,19 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
 
     ds.FlushCache()
     
+    output_cell_size = ds.GetGeoTransform()[1]
+
+    logging.info(str(output_cell_size))
+
     logging.info('Pimp me')
-    # (in_tif, out_tif, bands, s_expressions, ops)
-    pimp.me(vrt, f'{target_dir}/combi.tif', bands, s_expressions, color, lut)
-    
-    logging.info('COGify and saving results')
-    
+
+    pimp.me(vrt, 
+            f'{target_dir}/combi.tif', 
+            bands, 
+            s_expressions,
+            color, 
+            lut)
+
     ds = None
     del(ds)
     
@@ -203,16 +214,19 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
     logging.info('STAC')
     cat = Catalog(id='scombidooo',
                   description="Combined RGB composite") 
-    
-    # TODO fix geometry, bbox
-    item = Item(id='combi',
-                geometry=items[0].geometry,
-                bbox=items[0].bbox,
-                datetime=items[0].datetime,
-                properties={}) #items[0].properties)
 
-    # TODO fix gsd
-    item.common_metadata.set_gsd(10)
+    # TODO fix datetime
+    item = Item(id='combi',
+                geometry=mapping(loads(aoi)),
+                bbox=list(loads(aoi).bounds),
+                datetime=items[0].datetime,
+                properties={'bands': bands,
+                            's_expressions': s_expressions,
+                            'input_items': [_item.id for _item in items],
+                            'color': 'N/A' if not color else color,
+                            'profile': 'N/A' if not profile else profile}) 
+
+    item.common_metadata.set_gsd(output_cell_size)
 
     eo_item = extensions.eo.EOItemExt(item)
 
