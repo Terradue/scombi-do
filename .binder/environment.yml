@@ -15,6 +15,7 @@ dependencies:
   - ipyleaflet
   - requests
   - ipykernel
+  - cwltool
   - pip
   - pip:
     - rio_color
