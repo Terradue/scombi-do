@@ -20,7 +20,7 @@ build
 default.yaml
 owscontext.xml
 docker-build
-*.ipynb
+Unt*.ipynb
 .vscode
 catalog.json
 cwl-examples
