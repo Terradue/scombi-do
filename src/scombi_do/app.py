@@ -90,7 +90,7 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
     print('color ', color)
 
 
-    main(channel_inputs=channel_inputs,
+    main(channel_inputs=[os.path.join(channel_input, 'catalog.json') if channel_input else None for channel_input in channel_inputs],
          bands=bands,
          configuration=configuration,
          s_expressions=s_expressions, 
@@ -122,7 +122,7 @@ def main(channel_inputs, bands, configuration, s_expressions, resolution='highes
             assets_href.append(None)
             continue
             
-        item = get_item(os.path.join(input_path, 'catalog.json')) 
+        item = get_item(input_path) 
         
         logging.info(item)
         
