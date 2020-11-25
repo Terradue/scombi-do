@@ -1,5 +1,6 @@
 #!/bin/bash
 
-jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
+jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet --no-build
+jupyter lab build --minimize=False
 
 python setup.py install
