@@ -92,7 +92,6 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
 
     main(channel_inputs=[os.path.join(channel_input, 'catalog.json') if channel_input else None for channel_input in channel_inputs],
          bands=bands,
-         configuration=configuration,
          s_expressions=s_expressions, 
          resolution=resolution,
          aoi=aoi, 
@@ -101,7 +100,7 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          lut=lut,
          epsg=epsg)
 
-def main(channel_inputs, bands, configuration, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None, epsg=None):
+def main(channel_inputs, bands, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None, epsg=None):
 
     target_dir = 'combi'
     
