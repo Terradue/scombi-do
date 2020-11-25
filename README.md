@@ -1,4 +1,4 @@
-# scombi-do - Band combination
+# scombi-do - s(-expression)-combi(nation)-do
 
 This step combines input bands with optional band arithmetic to produce an RGB composite.
 
