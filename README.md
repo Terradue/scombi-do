@@ -2,7 +2,7 @@
 
 This step combines input bands with optional band arithmetic to produce an RGB composite.
 
-## Try on binder
+## Try me on binder
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Terradue/scombi-do/HEAD?urlpath=lab&filepath=demo%2Fscombi-do-demo.ipynb)
 
