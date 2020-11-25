@@ -4,13 +4,13 @@ import logging
 import click
 import gdal
 import json
-from pystac import *
+from pystac import Catalog, MediaType, Item, Asset, CatalogType
 from shapely.wkt import loads
 from .helpers import *
 from .conf import read_configuration
 from . import pimp 
 
-import numpy as np
+#import numpy as np
 
 from shapely.geometry import shape
 from shapely.geometry import mapping
@@ -65,8 +65,6 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
 
             print('Provide a profile or one or more s expressions')
             sys.exit(1)
-
-    print(s_expressions)
 
     # get the color profile via CLI parameter or via configuration
     if color is None:

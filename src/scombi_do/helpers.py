@@ -1,4 +1,4 @@
-from pystac import *
+from pystac import Catalog, extensions
 import gdal 
 import osr
 from urllib.parse import urlparse
@@ -45,13 +45,13 @@ def get_item(catalog):
 
 def get_band_asset_href(item, band):
     
-    asset = None
+    asset_ref = None
     
     eo_item = extensions.eo.EOItemExt(item)
     
     if (eo_item.bands) is not None:
 
-        for index, _band in enumerate(eo_item.bands):
+        for _band in eo_item.bands:
             
              if _band.common_name in [band]:
 
@@ -67,7 +67,7 @@ def get_band_asset(item, band):
     
     if (eo_item.bands) is not None:
 
-        for index, _band in enumerate(eo_item.bands):
+        for _band in eo_item.bands:
             
              if _band.common_name in [band]:
 
@@ -114,7 +114,7 @@ def get_epsg(epsg, assets_href):
     # get an EPSG code if it hasn't been supplied
     epsg_codes = []
 
-    for index, asset_href in enumerate(assets_href):
+    for asset_href in assets_href:
 
         if asset_href is None:
   
