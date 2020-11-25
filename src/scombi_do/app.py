@@ -247,8 +247,10 @@ def main(channel_inputs, bands, s_expressions, resolution='highest', aoi=None, c
     
     cat.normalize_and_save(root_href='./',
                            catalog_type=CatalogType.SELF_CONTAINED)
-        
+     
     logging.info('Done!')
+        
+    return(cat.get_self_href())
     
 if __name__ == '__main__':
     entry()
