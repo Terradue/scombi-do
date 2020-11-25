@@ -12,6 +12,9 @@ dependencies:
   - pyyaml
   - snuggs
   - matplotlib
+  - ipyleaflet
+  - requests
+  - ipykernel
   - pip
   - pip:
     - rio_color
