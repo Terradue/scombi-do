@@ -29,3 +29,5 @@ dist
 *.egg-info
 result*
 *.ovr
+demo/S2*
+combi
