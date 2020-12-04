@@ -36,7 +36,7 @@ logging.basicConfig(stream=sys.stderr,
 @click.option('--lut', 'lut', default=None, help='Matplotlib colormap')
 @click.option('--epsg', 'epsg', default=None, help='Target coordinate system as an EPSG code. Example EPSG:4326')
 @click.option('--s_expression', 's_expression', multiple=True, default=None)
-def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut, s_expression, epsg):
+def main(red_channel_input, green_channel_input, blue_channel_input, red_band, green_band, blue_band, aoi, resolution, conf, color, profile, lut, s_expression, epsg):
     
     logging.info('Scombidooo!')
 
@@ -90,7 +90,7 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
     print('color ', color)
 
 
-    main(channel_inputs=[os.path.join(channel_input, 'catalog.json') if channel_input else None for channel_input in channel_inputs],
+    scombi(channel_inputs=[os.path.join(channel_input, 'catalog.json') if channel_input else None for channel_input in channel_inputs],
          bands=bands,
          s_expressions=s_expressions, 
          resolution=resolution,
@@ -100,7 +100,7 @@ def entry(red_channel_input, green_channel_input, blue_channel_input, red_band, 
          lut=lut,
          epsg=epsg)
 
-def main(channel_inputs, bands, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None, epsg=None):
+def scombi(channel_inputs, bands, s_expressions, resolution='highest', aoi=None, color=None, profile=None, lut=None, epsg=None):
 
     target_dir = 'combi'
     
@@ -253,4 +253,4 @@ def main(channel_inputs, bands, s_expressions, resolution='highest', aoi=None, c
     return(cat.get_self_href())
     
 if __name__ == '__main__':
-    entry()
+    main()
