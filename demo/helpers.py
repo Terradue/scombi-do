@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import requests
 from requests.auth import HTTPBasicAuth
 from pystac import STAC_IO
+from pystac import STAC_IO, read_file, Item, Catalog, CatalogType
 
 def my_read_method(uri):
     
@@ -69,3 +70,40 @@ def item_to_img_overlay(item):
                     (shape(item.geometry).bounds[3], 
                      shape(item.geometry).bounds[2]))
         )
+
+def stage(input_references):
+    
+    STAC_IO.read_text_method = my_read_method
+    
+    catalogs = []
+
+    for index, input_reference in enumerate(input_references):
+
+        items = []
+
+        thing = read_file(input_reference)
+
+        if isinstance(thing, Item):
+
+            items.append(thing)
+
+        elif isinstance(thing, Catalog):
+
+            for item in thing.get_items():
+
+                items.append(item)
+
+        # create catalog
+        catalog = Catalog(id=items[0].id,
+                  description='staged STAC catalog with {}'.format(items[0].id))
+
+        catalog.add_items(items)
+
+        catalog.normalize_and_save(root_href=items[0].id,
+                                   catalog_type=CatalogType.RELATIVE_PUBLISHED)
+
+        catalog.describe()
+
+        catalogs.append(os.path.dirname(catalog.get_self_href()))
+        
+    return catalogs
