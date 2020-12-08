@@ -46,13 +46,12 @@ RUN chown -R $NB_USER:$NB_GID ${HOME}
 
 USER ${NB_USER}
 
-# workdir for binder
-COPY --chown=jovyan:100 . ${HOME}
-
-RUN cd ${HOME} && ${NB_PYTHON_PREFIX}/bin/python setup.py install
-
 ENV PREFIX /opt/anaconda/envs/${NB_PYTHON_PREFIX}
 
 ENV PATH /opt/anaconda/envs/${NB_PYTHON_PREFIX}/bin:$PATH
 
 WORKDIR ${HOME}
+
+COPY --chown=jovyan:100 . ${HOME}
+
+RUN cd ${HOME} && ${NB_PYTHON_PREFIX}/bin/python setup.py install
