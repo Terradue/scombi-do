@@ -160,13 +160,13 @@ $graph:
   outputs:
   - id: wf_outputs
     outputSource:
-    - node_1/results
+    - step_1/results
     type:
       Directory
   requirements:
     - class: SubworkflowFeatureRequirement
   steps:
-    node_0:
+    step_0:
       in:
         context: context
         dockerfile: dockerfile
@@ -174,9 +174,9 @@ $graph:
       - nothing
       run: '#docker-builder'
 
-    node_1:
+    step_1:
       in:
-        inp0: node_0/nothing
+        inp0: step_0/nothing
         inp1: red-channel-input
         inp2: green-channel-input
         inp3: blue-channel-input
