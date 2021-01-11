@@ -1,0 +1,43 @@
+digraph G {
+bgcolor="#eeeeee";
+clusterrank=local;
+labeljust=right;
+labelloc=bottom;
+subgraph cluster_inputs {
+label="Workflow Inputs";
+rank=same;
+style=dashed;
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/green-channel-input" [fillcolor="#94DDF4", label="scombi-do/green-channel-input", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/aoi" [fillcolor="#94DDF4", label="scombi-do/aoi", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/green-band" [fillcolor="#94DDF4", label="scombi-do/green-band", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/blue-band" [fillcolor="#94DDF4", label="scombi-do/blue-band", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/color" [fillcolor="#94DDF4", label="scombi-do/color", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/resolution" [fillcolor="#94DDF4", label="scombi-do/resolution", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/lut" [fillcolor="#94DDF4", label="scombi-do/lut", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/profile" [fillcolor="#94DDF4", label="scombi-do/profile", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/blue-channel-input" [fillcolor="#94DDF4", label="scombi-do/blue-channel-input", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/red-band" [fillcolor="#94DDF4", label="scombi-do/red-band", shape=record, style=filled];
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/red-channel-input" [fillcolor="#94DDF4", label="scombi-do/red-channel-input", shape=record, style=filled];
+}
+
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/green-channel-input" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/aoi" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/green-band" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/blue-band" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/color" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/resolution" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/lut" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/profile" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/blue-channel-input" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/red-band" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/red-channel-input" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1";
+subgraph cluster_outputs {
+label="Workflow Outputs";
+labelloc=b;
+rank=same;
+style=dashed;
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/wf_outputs" [fillcolor="#94DDF4", label="scombi-do/wf_outputs", shape=record, style=filled];
+}
+
+"file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/step_1" -> "file:///workspace/scombi-do/cwl/scombi-do.cwl#scombi-do/wf_outputs";
+}

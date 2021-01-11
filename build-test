@@ -1,0 +1,50 @@
+digraph G {
+bgcolor="#eeeeee";
+clusterrank=local;
+labeljust=right;
+labelloc=bottom;
+"file:///workspace/scombi-do/build-test.cwl#main/step_0" [fillcolor=lightgoldenrodyellow, label="main/step_0", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/step_1" [fillcolor=lightgoldenrodyellow, label="main/step_1", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/step_0" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+subgraph cluster_inputs {
+label="Workflow Inputs";
+rank=same;
+style=dashed;
+"file:///workspace/scombi-do/build-test.cwl#main/resolution" [fillcolor="#94DDF4", label="main/resolution", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/red-channel-input" [fillcolor="#94DDF4", label="main/red-channel-input", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/blue-band" [fillcolor="#94DDF4", label="main/blue-band", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/aoi" [fillcolor="#94DDF4", label="main/aoi", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/context" [fillcolor="#94DDF4", label="main/context", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/lut" [fillcolor="#94DDF4", label="main/lut", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/green-band" [fillcolor="#94DDF4", label="main/green-band", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/profile" [fillcolor="#94DDF4", label="main/profile", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/red-band" [fillcolor="#94DDF4", label="main/red-band", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/green-channel-input" [fillcolor="#94DDF4", label="main/green-channel-input", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/dockerfile" [fillcolor="#94DDF4", label="main/dockerfile", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/blue-channel-input" [fillcolor="#94DDF4", label="main/blue-channel-input", shape=record, style=filled];
+"file:///workspace/scombi-do/build-test.cwl#main/color" [fillcolor="#94DDF4", label="main/color", shape=record, style=filled];
+}
+
+"file:///workspace/scombi-do/build-test.cwl#main/resolution" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/red-channel-input" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/blue-band" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/aoi" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/context" -> "file:///workspace/scombi-do/build-test.cwl#main/step_0";
+"file:///workspace/scombi-do/build-test.cwl#main/lut" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/green-band" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/profile" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/red-band" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/green-channel-input" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/dockerfile" -> "file:///workspace/scombi-do/build-test.cwl#main/step_0";
+"file:///workspace/scombi-do/build-test.cwl#main/blue-channel-input" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+"file:///workspace/scombi-do/build-test.cwl#main/color" -> "file:///workspace/scombi-do/build-test.cwl#main/step_1";
+subgraph cluster_outputs {
+label="Workflow Outputs";
+labelloc=b;
+rank=same;
+style=dashed;
+"file:///workspace/scombi-do/build-test.cwl#main/wf_outputs" [fillcolor="#94DDF4", label="main/wf_outputs", shape=record, style=filled];
+}
+
+"file:///workspace/scombi-do/build-test.cwl#main/step_1" -> "file:///workspace/scombi-do/build-test.cwl#main/wf_outputs";
+}

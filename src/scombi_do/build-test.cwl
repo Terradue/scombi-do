@@ -1,8 +1,37 @@
 $graph:
+
+- baseCommand: docker 
+
+  class: CommandLineTool
+  id: docker-builder  
+
+  inputs:
+    context:
+       type: Directory
+    dockerfile:
+       type: File
+  arguments:    
+  - build
+  - prefix: -t
+    valueFrom: terradue/opt_calibration:0.2
+  - prefix: -f
+    valueFrom: $(inputs.dockerfile) 
+  - valueFrom: $(inputs.context.path)
+
+  outputs:
+    nothing:
+      outputBinding:
+        glob: .
+      type: Directory
+      
+  requirements:
+    InlineJavascriptRequirement: {}
+
 - baseCommand: scombi-do
+  arguments: ['--profile', 'composite']
   hints:
     DockerRequirement:
-      dockerPull: terradue/scombi-do:0.1
+      dockerPull: scombi:latest 
   class: CommandLineTool
   id: clt
   inputs:
@@ -53,11 +82,6 @@ $graph:
       type: string? 
     inp10:
       inputBinding:
-        position: 10
-        prefix: --profile
-      type: string?
-    inp11:
-      inputBinding:
         position: 11
         prefix: --lut
       type: string?
@@ -74,10 +98,15 @@ $graph:
     ResourceRequirement: {}
 #  stderr: std.err
   stdout: std.out
+
 - class: Workflow
-  doc: This step combines three bands as an RGB composite
+  doc: This workflow combines three bands as an RGB composite
   id: scombi-do
   inputs:
+    input_reference:
+      doc: EO product for vegetation index
+      label: EO product for vegetation index
+      type: Directory[]
     red-channel-input:
       doc: EO product for red channel
       label: EO product for red channel
@@ -114,23 +143,36 @@ $graph:
       doc: Color expression
       label: Area of interest
       type: string?
-    profile:
-      doc: profile expression
-      label: profile
-      type: string?
     lut:
       doc: lut
       label: lut
-      type: string?
+      type: string? 
+    context:
+      type: Directory
+    dockerfile:
+      type: File
   label: Band combination
+
   outputs:
   - id: wf_outputs
     outputSource:
-    - step_1/results
+    - node_1/results
     type:
-      Directory
+      items: Directory
+      type: array
+  requirements:
+
+  - class: SubworkflowFeatureRequirement
   steps:
-    step_1:
+    node_0:
+      in:
+        context: context
+        dockerfile: dockerfile
+      out:
+      - nothing
+      run: '#docker-builder'
+
+    node_1:
       in:
         inp1: red-channel-input
         inp2: green-channel-input
@@ -141,9 +183,10 @@ $graph:
         inp7: resolution
         inp8: aoi
         inp9: color
-        inp10: profile
-        inp11: lut
+        inp10: lut
+        inp12: node_0/nothing
       out:
       - results
       run: '#clt'
+
 cwlVersion: v1.0

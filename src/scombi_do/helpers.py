@@ -115,17 +115,18 @@ def get_epsg(epsg, assets_href):
     epsg_codes = []
 
     for asset_href in assets_href:
-
+        print(asset_href)
         if asset_href is None:
   
             epsg_codes.append(None)
             continue
-        
+        print('open')
         ds = gdal.Open(asset_href)
         proj = osr.SpatialReference(wkt=ds.GetProjection()).GetAttrValue('AUTHORITY',1)
       
         epsg_codes.append(f'EPSG:{proj}')
 
+    print(epsg_codes)
     if epsg is None:
         # get the most represented code
         epsg = Counter([code for code in epsg_codes if code]).most_common(1)[0][0] 
